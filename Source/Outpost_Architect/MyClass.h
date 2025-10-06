@@ -4,3 +4,12 @@
 
 #include "CoreMinimal.h"
 
+/**
+ * 
+ */
+class OUTPOST_ARCHITECT_API MyClass
+{
+public:
+	MyClass();
+	~MyClass();
+};
