@@ -6,12 +6,13 @@
 #include "BehaviorTree/BTDecorator.h"
 #include "Decorator_CanAtk.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class OUTPOST_ARCHITECT_API UDecorator_CanAtk : public UBTDecorator
 {
 	GENERATED_BODY()
 	
+public:
+	UDecorator_CanAtk();
+
+	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem) const override;
 };

@@ -6,12 +6,19 @@
 #include "BehaviorTree/BTTaskNode.h"
 #include "Task_BackMove.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class OUTPOST_ARCHITECT_API UTask_BackMove : public UBTTaskNode
 {
 	GENERATED_BODY()
-	
+
+public:
+	UTask_BackMove();
+
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem) override;
+
+	UPROPERTY(EditAnywhere, Category = "Task")
+	float BackMoveSpeed = 200.f;
+
+protected:
+	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem, float DeltaSeconds) override;
 };

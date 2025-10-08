@@ -4,14 +4,53 @@
 
 #include "CoreMinimal.h"
 #include "PaperCharacter.h"
+#include "Interfaces/OnDamage.h"
+#include "OAStruct.h"
 #include "OA2DCharacterBase.generated.h"
 
 /**
  * 
  */
-UCLASS()
-class OUTPOST_ARCHITECT_API AOA2DCharacterBase : public APaperCharacter
+UCLASS(Abstract)
+class OUTPOST_ARCHITECT_API AOA2DCharacterBase : public APaperCharacter, public IOnDamage
 {
 	GENERATED_BODY()
 	
+public:
+	AOA2DCharacterBase();
+
+	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+	float MaxHealth = 100.f;
+	UPROPERTY(BlueprintReadOnly, Category = "Health")
+	float CurrHealth = 100.f;
+
+	virtual void TakeDamage_Implementation(const FDamage& DInfo) override;
+	virtual float GetCurrHealth_Implementation() const override;
+	virtual float GetMaxHealth_Implementation() const override;
+	virtual bool Alive_Implementation() const override;
+	virtual void Die_Implementation() override;
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void Heal(float Heal);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float MoveSpeed = 300.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float JumpH = 500.f;
+
+	UFUNCTION(BlueprintCallable, Category = "Sprite")
+	void UpdateSpriteDir(float Dir);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
+	void OnDamageReceive(float Dmg);
+	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
+	void Death();
+
+protected:
+	virtual void BeginPlay() override;
+	virtual void DeathFinish();
+
+	float LastDir = 1.f;
 };

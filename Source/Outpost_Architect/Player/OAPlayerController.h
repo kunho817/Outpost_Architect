@@ -4,14 +4,38 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "OAPlayerController.generated.h"
+#include "OaPlayerController.generated.h"
 
 /**
  * 
  */
+
+class UBuildManager;
+class AOABuildingBase;
+
 UCLASS()
-class OUTPOST_ARCHITECT_API AOAPlayerController : public APlayerController
+class OUTPOST_ARCHITECT_API AOaPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
+public:
+	AOaPlayerController();
+
+protected:
+	virtual void BeginPlay() override;
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "Build System")
+	void BuildModeOn(TSubclassOf<AOABuildingBase> BuildingClass);
+	UFUNCTION(BlueprintCallable, Category = "Build System")
+	void BuildModeOff();
+	UFUNCTION(BlueprintCallable, Category = "Build System")
+	void TryPlaceBuild();
+	UFUNCTION(BlueprintCallable, Category = "Build System")
+	void TryDestroyBuilding();
+	UFUNCTION(BlueprintPure, Category = "Build System")
+	bool InBuildMode() const;
+
+protected:
+	UBuildManager* BuildMan;
 };

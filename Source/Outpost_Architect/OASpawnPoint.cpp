@@ -2,12 +2,20 @@
 
 
 #include "OASpawnPoint.h"
+#include "Components/BillboardComponent.h"
 
 // Sets default values
 AOASpawnPoint::AOASpawnPoint()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+
+	Icon = CreateDefaultSubobject<UBillboardComponent>(TEXT("Icon"));
+	RootComponent = Icon;
+
+	SpawnType = EEnemyMoveType::Normal;
+
+	Tags.Add(FName("SpawnPoint"));
 
 }
 
@@ -16,12 +24,5 @@ void AOASpawnPoint::BeginPlay()
 {
 	Super::BeginPlay();
 	
-}
-
-// Called every frame
-void AOASpawnPoint::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 

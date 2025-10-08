@@ -22,4 +22,12 @@ class OUTPOST_ARCHITECT_API IInteractable
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interact")
+	bool CanInteract(AActor* Interactor) const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interact")
+	void Interact(AActor* Interactor);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interact")
+	FText GetInteractionText() const;
 };

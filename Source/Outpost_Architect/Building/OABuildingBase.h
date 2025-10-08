@@ -4,10 +4,26 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/OnDamage.h"
+#include "Interfaces/Buildable.h"
+#include "OAEnum.h"
+#include "OAStruct.h"
 #include "OABuildingBase.generated.h"
 
+class UPaperSpriteComponent;
+class UBoxComponent;
+
+UENUM(BlueprintType)
+enum class EBuildingState : uint8
+{
+	Construct,
+	Enabled,
+	Disabled,
+	Destroyed
+};
+
 UCLASS()
-class OUTPOST_ARCHITECT_API AOABuildingBase : public AActor
+class OUTPOST_ARCHITECT_API AOABuildingBase : public AActor, public IOnDamage, public IBuildable
 {
 	GENERATED_BODY()
 	
@@ -23,4 +39,82 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
+	UBoxComponent* ColComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
+	UPaperSpriteComponent* SpriteComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Info")
+	EBuildingType BType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Info")
+	FText BName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Info")
+	FText BDesc;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Info")
+	EBuildingState BState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Stat")
+	float MaxHealth;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Stat")
+	float CurrHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Construct")
+	FBuildCost BCost;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Construct")
+	float ConstTime;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Building|Construct")
+	float ConstProg;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Power")
+	float PowerCons;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Power")
+	float PowerProd;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Building|Power")
+	bool GenPower;
+
+public:
+	virtual void TakeDamage_Implementation(const FDamage& DInfo) override;
+	virtual float GetCurrHealth_Implementation() const override { return CurrHealth; }
+	virtual float GetMaxHealth_Implementation() const override { return MaxHealth; }
+	virtual bool Alive_Implementation() const override { return CurrHealth > 0; }
+	virtual void Die_Implementation() override;
+
+	virtual EBuildingType GetBType_Implementation() const override { return BType; }
+	virtual FBuildCost GetBCost_Implementation() const override { return BCost; }
+	virtual bool CanBuild_Implementation(const FVector& Loc) const override;
+	virtual void ConstructBuilding_Implementation(const FVector& Loc) override;
+	virtual void DestoryBuliding_Implementation() override;
+
+	UFUNCTION(BlueprintCallable, Category = "Building")
+	void SetBState(EBuildingState NState);
+	UFUNCTION(BlueprintPure, Category = "Building")
+	EBuildingState GetBState() const { return BState; }
+	UFUNCTION(BlueprintPure, Category = "Building")
+	bool IsOperation() const { return BState == EBuildingState::Enabled; }
+
+	UFUNCTION(BlueprintCallable, Category = "Building")
+	void StartConstruct();
+	UFUNCTION(BlueprintCallable, Category = "Building")
+	void UpdateConstruct(float DeltaTime);
+	UFUNCTION(BlueprintCallable, Category = "Building")
+	void CompleteConstruct();
+
+	UFUNCTION(BlueprintCallable, Category = "Building")
+	void SetPowerState(bool Powered);
+	UFUNCTION(BlueprintPure, Category = "Building")
+	bool HasGenPower() const { return GenPower; }
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "Building")
+	void OnBuildingConstruct();
+	virtual void OnBuildingConstruct_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Building")
+	void OnBuildingDestroy();
+	virtual void OnBuildingDestroy_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Building")
+	void OnPowerStateChange(bool Powered);
+	virtual void OnPowerStateChange_Implementation(bool Powered);
 };
