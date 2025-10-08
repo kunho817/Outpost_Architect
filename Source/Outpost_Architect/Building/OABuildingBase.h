@@ -53,12 +53,15 @@ protected:
 	FText BDesc;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Info")
 	EBuildingState BState;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Info")
+	FVector BuildingSize;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Stat")
 	float MaxHealth;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Stat")
 	float CurrHealth;
 
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Construct")
 	FBuildCost BCost;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Construct")
@@ -86,6 +89,8 @@ public:
 	virtual void ConstructBuilding_Implementation(const FVector& Loc) override;
 	virtual void DestoryBuliding_Implementation() override;
 
+	UFUNCTION(BlueprintPure, Category = "Building")
+	FVector GetBuildingSize() const { return BuildingSize; }
 	UFUNCTION(BlueprintCallable, Category = "Building")
 	void SetBState(EBuildingState NState);
 	UFUNCTION(BlueprintPure, Category = "Building")

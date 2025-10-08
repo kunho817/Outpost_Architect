@@ -19,6 +19,7 @@ AOABuildingBase::AOABuildingBase()
 	SpriteComp = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("SpriteComponent"));
 	SpriteComp->SetupAttachment(RootComponent);
 
+	BuildingSize = FVector(100.0f, 100.0f, 100.0f);
 	BType = EBuildingType::Core;
 	BState = EBuildingState::Construct;
 

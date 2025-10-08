@@ -60,6 +60,7 @@ void UBuildManager::BuildModeOn(TSubclassOf<AOABuildingBase> BuildingClass)
 	BuildModeActive = true;
 
 	CreateGhost();
+	OnBuildModeChange.Broadcast(true);
 }
 
 void UBuildManager::BuildModeOff()
@@ -68,6 +69,7 @@ void UBuildManager::BuildModeOff()
 	SelectBuildingClass = nullptr;
 
 	DestroyGhost();
+	OnBuildModeChange.Broadcast(false);
 }
 
 void UBuildManager::UpdateGhostPos()
@@ -85,6 +87,7 @@ void UBuildManager::UpdateGhostPos()
 	CanPlace = CanPlaceBuilding();
 
 	UpdateGhostMat();
+	OnPlacementChange.Broadcast(CanPlace, CurrPlaceLoc);
 }
 
 bool UBuildManager::TryPlaceBuilding()
@@ -103,7 +106,17 @@ bool UBuildManager::TryPlaceBuilding()
 
 	if (NBuilding) {
 		ConsumeResource(BCost);
-		Grid->OccupyGrid(CurrCoord, NBuilding);
+
+		FVector BuildingSize = NBuilding->GetBuildingSize();
+		int32 W = FMath::CeilToInt(BuildingSize.X / Grid->GetGridSize());
+		int32 H = FMath::CeilToInt(BuildingSize.Y / Grid->GetGridSize());
+
+		for (int32 X = 0; X < W; X++) {
+			for (int32 Y = 0; Y < H; Y++) {
+				FGridCoord OccupCoord(CurrCoord.X + X, CurrCoord.Y + Y);
+				Grid->OccupyGrid(OccupCoord, NBuilding);
+			}
+		}
 		NBuilding->StartConstruct();
 
 		return true;
@@ -116,7 +129,7 @@ bool UBuildManager::CanPlaceBuilding()
 {
 	if (!Grid || !Ghost) return false;
 
-	FVector BuildingSize = Ghost->GetComponentsBoundingBox().GetSize();
+	FVector BuildingSize = Ghost->GetBuildingSize();
 	if (!Grid->CanPlace(CurrCoord, BuildingSize)) return false;
 
 	if (OwnerCon) {
@@ -140,8 +153,24 @@ void UBuildManager::DestroyBuildingAtLocation()
 	AActor* Building = Grid->GetBuilding(Coord);
 
 	if (Building && Building->GetClass()->ImplementsInterface(UBuildable::StaticClass())) {
+		AOABuildingBase* OBuilding = Cast<AOABuildingBase>(Building);
+		if (OBuilding) {
+			FVector BuildingSize = OBuilding->GetBuildingSize();
+			int32 W = FMath::CeilToInt(BuildingSize.X / Grid->GetGridSize());
+			int32 H = FMath::CeilToInt(BuildingSize.Y / Grid->GetGridSize());
+
+			FVector BuildLoc = Building->GetActorLocation();
+			FGridCoord StartCoord = Grid->WorldToGrid(BuildLoc);
+
+			for (int32 X = 0; X < W; X++) {
+				for (int32 Y = 0; Y < H; Y++) {
+					FGridCoord FreeCoord(CurrCoord.X + X, CurrCoord.Y + Y);
+					Grid->FreeGrid(FreeCoord);
+				}
+			}
+		}
+
 		IBuildable::Execute_DestoryBuliding(Building);
-		Grid->FreeGrid(Coord);
 	}
 }
 

@@ -10,6 +10,7 @@
  * 
  */
 
+class UInputAction;
 class UBuildManager;
 class AOABuildingBase;
 
@@ -23,8 +24,10 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
 
 public:
+	
 	UFUNCTION(BlueprintCallable, Category = "Build System")
 	void BuildModeOn(TSubclassOf<AOABuildingBase> BuildingClass);
 	UFUNCTION(BlueprintCallable, Category = "Build System")
@@ -38,4 +41,12 @@ public:
 
 protected:
 	UBuildManager* BuildMan;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* PlaceBuildingAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* CancelBuildingAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* DestroyAction;
+
 };

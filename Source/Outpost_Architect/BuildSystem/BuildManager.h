@@ -13,6 +13,8 @@ class AOABuildingBase;
 class UInputAction;
 class UInputMappingContext;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBuildModeChange, bool, IsActive);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPlacementChange, bool, IsCanPlace, FVector, Loc);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class OUTPOST_ARCHITECT_API UBuildManager : public UActorComponent
@@ -81,6 +83,11 @@ public:
 	bool HasEnoughResource(FBuildCost BCost);
 	UFUNCTION(BlueprintCallable, Category = "Build")
 	void ConsumeResource(FBuildCost BCost);
+
+	UPROPERTY(BlueprintAssignable, Category = "Build Events")
+	FOnBuildModeChange OnBuildModeChange;
+	UPROPERTY(BlueprintAssignable, Category = "Build Events")
+	FOnPlacementChange OnPlacementChange;
 
 protected:
 	void CreateGhost();

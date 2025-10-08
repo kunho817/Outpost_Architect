@@ -5,6 +5,9 @@
 #include "Core/OAGameMode.h"
 #include "BuildSystem/BuildManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputActionValue.h"
 
 AOaPlayerController::AOaPlayerController()
 {
@@ -23,6 +26,17 @@ void AOaPlayerController::BeginPlay()
 	if (GM) {
 		BuildMan = GM->GetBuildMan();
 		if (BuildMan) BuildMan->SetPlayerCon(this);
+	}
+}
+
+void AOaPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent)) {
+		if (PlaceBuildingAction) EIC->BindAction(PlaceBuildingAction, ETriggerEvent::Triggered, this, &AOaPlayerController::TryPlaceBuild);
+		if (CancelBuildingAction) EIC->BindAction(CancelBuildingAction, ETriggerEvent::Triggered, this, &AOaPlayerController::BuildModeOff);
+		if (DestroyAction) EIC->BindAction(DestroyAction, ETriggerEvent::Triggered, this, &AOaPlayerController::TryDestroyBuilding);
 	}
 }
 
