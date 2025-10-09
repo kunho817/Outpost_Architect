@@ -131,6 +131,8 @@ void UOAWaveManager::RegisterEnemy(APawn* Enemy)
 	if (Enemy && !LivingEnemy.Contains(Enemy))
 	{
 		LivingEnemy.Add(Enemy);
+		UE_LOG(LogTemp, Log, TEXT("✅ WaveManager: Enemy registered - %s (Total: %d)"),
+			*Enemy->GetName(), LivingEnemy.Num());
 	}
 }
 
@@ -138,6 +140,17 @@ void UOAWaveManager::UnregisterEnemy(APawn* Enemy)
 {
 	LivingEnemy.Remove(Enemy);
 	RemainingEnemy = FMath::Max(0, RemainingEnemy - 1);
+}
+
+void UOAWaveManager::RegisterCore(AActor* Core)
+{
+	if (!Core) {
+		UE_LOG(LogTemp, Error, TEXT("❌ WaveManager: Tried to register null core"));
+		return;
+	}
+
+	BaseCore = Core;
+	UE_LOG(LogTemp, Warning, TEXT("✅ WaveManager: Core registered - %s"), *Core->GetName());
 }
 
 void UOAWaveManager::RefreshSpawn()

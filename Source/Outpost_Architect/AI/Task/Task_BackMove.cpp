@@ -2,11 +2,11 @@
 
 
 #include "AI/Task/Task_BackMove.h"
+#include "AI/OAAIController.h"
 #include "AIController.h"
 #include "Characters/OAEnemyBase.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/KismetMathLibrary.h"
 
 UTask_BackMove::UTask_BackMove()
 {
@@ -14,7 +14,7 @@ UTask_BackMove::UTask_BackMove()
 	bNotifyTick = true;
 }
 
-EBTNodeResult::Type UTask_BackMove::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem)
+EBTNodeResult::Type UTask_BackMove::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	AAIController* AICon = OwnerComp.GetAIOwner();
 	if (!AICon) return EBTNodeResult::Failed;
@@ -22,23 +22,20 @@ EBTNodeResult::Type UTask_BackMove::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	AOAEnemyBase* Enemy = Cast<AOAEnemyBase>(AICon->GetPawn());
 	if (!Enemy) return EBTNodeResult::Failed;
 
-	AActor* Target = Enemy->GetTarget();
+	UBlackboardComponent* BB = OwnerComp.GetBlackboardComponent();
+	if(!BB) return EBTNodeResult::Failed;
+
+	AActor* Target = Cast<AActor>(BB->GetValueAsObject(AOAAIController::CurrentActorKey));
 	if (!Target) return EBTNodeResult::Failed;
-
-	FVector EnemyLoc = Enemy->GetActorLocation();
-	FVector TargetLoc = Target->GetActorLocation();
-	FVector Dir = (EnemyLoc - TargetLoc).GetSafeNormal();
-
-	FVector BackMoveLoc = EnemyLoc + (Dir * Enemy->BackMoveDist);
 
 	if (UCharacterMovementComponent* MoveComp = Enemy->GetCharacterMovement()) MoveComp->MaxWalkSpeed = BackMoveSpeed;
 
 	return EBTNodeResult::InProgress;
 }
 
-void UTask_BackMove::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem, float DeltaSeconds)
+void UTask_BackMove::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
-	Super::TickTask(OwnerComp, NodeMem, DeltaSeconds);
+	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
 	AAIController* AICon = OwnerComp.GetAIOwner();
 	if (!AICon) {
@@ -52,13 +49,22 @@ void UTask_BackMove::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem,
 		return;
 	}
 
-	AActor* Target = Enemy->GetTarget();
+	UBlackboardComponent* BB = OwnerComp.GetBlackboardComponent();
+	if (!BB) {
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		return;
+	}
+
+	AActor* Target = Cast<AActor>(BB->GetValueAsObject(AOAAIController::CurrentActorKey));
 	if (!Target) {
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		return;
 	}
 
-	float DistTarget = Enemy->GetDistTarget();
+	FVector EnemyLoc = Enemy->GetActorLocation();
+	FVector TargetLoc = Target->GetActorLocation();
+
+	float DistTarget = FVector::Dist(EnemyLoc, TargetLoc);
 
 	if (DistTarget >= Enemy->BackMoveDist) {
 		if (UCharacterMovementComponent* MoveComp = Enemy->GetCharacterMovement()) MoveComp->MaxWalkSpeed = Enemy->MoveSpeed;
@@ -67,10 +73,8 @@ void UTask_BackMove::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem,
 		return;
 	}
 
-	FVector EnemyLoc = Enemy->GetActorLocation();
-	FVector TargetLoc = Target->GetActorLocation();
+	
 	FVector Dir = (EnemyLoc - TargetLoc).GetSafeNormal();
-
 	FVector MoveDir = FVector(Dir.X, 0.f, 0.f);
 
 	Enemy->AddMovementInput(MoveDir, 1.0f);

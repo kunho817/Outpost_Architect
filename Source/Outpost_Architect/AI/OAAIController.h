@@ -20,18 +20,16 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI")
 	UBehaviorTree* BT;
 
-	static const FName TargetActorKey;
+	static const FName CurrentActorKey;
+	static const FName CoreTargetKey;
+	static const FName PlayerTargetKey;
+	static const FName ObstacleTargetKey;
 	static const FName SelfActorKey;
 	static const FName AtkRangeKey;
 	static const FName DetectRangeKey;
 	static const FName EnemyTypeKey;
 
-	UFUNCTION(BlueprintCallable, Category = "AI")
-	void SetTargetActor(AActor* Target);
-	UFUNCTION(BlueprintPure, Category = "AI")
-	AActor* GetTargetActor() const;
-
 protected:
-	virtual void OnPossess(APawn* Pawn) override;
+	virtual void OnPossess(APawn* IPawn) override;
 	virtual void OnUnPossess() override;
 };

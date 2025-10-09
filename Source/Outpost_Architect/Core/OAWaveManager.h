@@ -109,6 +109,11 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnWaveTrigger OnWaveTrigger;
 
+	UFUNCTION(BlueprintCallable, Category = "Wave")
+	void RegisterCore(AActor* Core);
+	UFUNCTION(BlueprintPure, Category = "Wave")
+	AActor* GetCore() const { return BaseCore; }
+
 protected:
 
 	UPROPERTY()
@@ -119,6 +124,8 @@ protected:
 
 	UPROPERTY()
 	TArray<AActor*> ActiveSpawnPoint;
+	UPROPERTY()
+	AActor* BaseCore;
 
 	void RefreshSpawn();
 	FVector GetRandomSpawnByType(EEnemyMoveType EMType) const;

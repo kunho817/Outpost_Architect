@@ -31,7 +31,7 @@ AOABuildingBase::AOABuildingBase()
 
 	PowerCons = 0.0f;
 	PowerProd = 0.0f;
-	GenPower = true;
+	GenPower = false;
 }
 
 // Called when the game starts or when spawned

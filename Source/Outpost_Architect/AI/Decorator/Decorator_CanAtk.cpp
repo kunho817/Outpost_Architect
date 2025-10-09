@@ -10,7 +10,7 @@ UDecorator_CanAtk::UDecorator_CanAtk()
 	NodeName = "Can Attack";
 }
 
-bool UDecorator_CanAtk::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem) const
+bool UDecorator_CanAtk::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	AAIController* AICon = OwnerComp.GetAIOwner();
 	if (!AICon) return false;

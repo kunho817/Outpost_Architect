@@ -2,6 +2,7 @@
 
 
 #include "AI/Task/Task_RangeAttack.h"
+#include "AI/OAAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
 #include "Characters/OAEnemyBase.h"
@@ -10,11 +11,9 @@
 UTask_RangeAttack::UTask_RangeAttack()
 {
 	NodeName = "Ranged Attack";
-
-	TargetActorKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UTask_RangeAttack, TargetActorKey), AActor::StaticClass());
 }
 
-EBTNodeResult::Type UTask_RangeAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem)
+EBTNodeResult::Type UTask_RangeAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	AAIController* AICon = OwnerComp.GetAIOwner();
 	if (!AICon) return EBTNodeResult::Failed;
@@ -25,11 +24,12 @@ EBTNodeResult::Type UTask_RangeAttack::ExecuteTask(UBehaviorTreeComponent& Owner
 	if (!Enemy->CanAtk()) return EBTNodeResult::Failed;
 
 	UBlackboardComponent* BB = OwnerComp.GetBlackboardComponent();
+	if (!BB) return EBTNodeResult::Failed;
+
 	AActor* TargetA = Cast<AActor>(BB->GetValueAsObject(TargetActorKey.SelectedKeyName));
 	if (!TargetA) return EBTNodeResult::Failed;
 
 	FVector SpawnLoc = Enemy->GetActorLocation();
-
 	FVector TargetLoc = TargetA->GetActorLocation();
 	FVector Dir = (TargetLoc - SpawnLoc).GetSafeNormal();
 
@@ -41,7 +41,7 @@ EBTNodeResult::Type UTask_RangeAttack::ExecuteTask(UBehaviorTreeComponent& Owner
 
 	if (Proj) {
 		Proj->InitProjectile(Enemy->GetDmg(), Enemy, Dir);
-		Enemy->DoAtk();
+		Enemy->DoAtk(TargetA);
 		return EBTNodeResult::Succeeded;
 	}
 

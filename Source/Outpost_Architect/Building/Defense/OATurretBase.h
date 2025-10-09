@@ -40,8 +40,6 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
-	USphereComponent* DetectRange;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	USceneComponent* TurretHead;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	USceneComponent* ShotPoint;
@@ -66,8 +64,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Turret|Targeting")
 	AActor* CurrTarget;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Turret|Targeting")
-	TArray<AActor*> DetectEnemy;
 
 	float PrevAtkTime;
 
@@ -77,7 +73,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Turret")
 	void SearchTarget();
 	UFUNCTION(BlueprintCallable, Category = "Turret")
-	void SelectTarget();
+	void SelectTarget(const TArray<AActor*>& EnemyArr);
 	UFUNCTION(BlueprintCallable, Category = "Turret")
 	bool IsValidTarget(AActor* Target);
 	UFUNCTION(BlueprintCallable, Category = "Turret")
@@ -98,12 +94,6 @@ public:
 	bool IsAimToTarget();
 
 protected:
-
-	UFUNCTION()
-	void OnDetectBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	void OnDetectEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Turret")
 	void OnTargetAcquire(AActor* Target);

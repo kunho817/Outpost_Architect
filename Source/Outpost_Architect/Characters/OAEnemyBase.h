@@ -16,10 +16,6 @@ class OUTPOST_ARCHITECT_API AOAEnemyBase : public AOA2DCharacterBase
 {
 	GENERATED_BODY()
 	
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Ranged")
-	TSubclassOf<class AOAProjectile> ProjClass;
-
 public:
 	AOAEnemyBase();
 
@@ -34,17 +30,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	float AtkRange = 150.f;
 
-	UPROPERTY(BlueprintReadOnly, Category = "AI")
-	AActor* TargetA = nullptr;
-	UFUNCTION(BlueprintCallable, Category = "AI")
-	void SetTarget(AActor* NewT);
-	UFUNCTION(BlueprintPure, Category = "AI")
-	AActor* GetTarget() const { return TargetA; }
-	UFUNCTION(BlueprintPure, Category = "AI")
-	float GetDistTarget() const;
-	UFUNCTION(BlueprintCallable, Category = "AI")
-	AActor* FindTarget();
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float AtkDmg = 10.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
@@ -52,9 +37,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	float PrevAtkTime = 0.f;
 	UFUNCTION(BlueprintCallable, Category = "Combat")
-	virtual void DoAtk();
+	virtual void DoAtk(AActor* Target);
 	UFUNCTION(BlueprintPure, Category = "Combat")
 	bool CanAtk() const;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Ranged")
+	TSubclassOf<class AOAProjectile> ProjClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	EEnemyMoveType MoveType = EEnemyMoveType::Normal;
@@ -66,6 +53,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|BackMove")
 	float BackMoveDur = 1.0f;
 
+	UFUNCTION(BlueprintPure, Category = "Enemy")
+	float GetAtkRange() const { return AtkRange; }
+	UFUNCTION(BlueprintPure, Category = "Enemy")
+	float GetDetectRange() const { return DetectRange; }
+	UFUNCTION(BlueprintPure, Category = "Enemy")
+	EEnemyType GetEnemyType() const { return ET; }
+	UFUNCTION(BlueprintPure, Category = "Enemy")
+	EEnemyMoveType GetMoveType() const { return MoveType; }
 	UFUNCTION(BlueprintPure, Category = "Combat")
 	TSubclassOf<AOAProjectile> GetProjClass() const { return ProjClass; }
 	UFUNCTION(BlueprintPure, Category = "Combat")
@@ -75,7 +70,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
 	virtual void DeathFinish() override;
 
 	UOAWaveManager* WaveMan = nullptr;

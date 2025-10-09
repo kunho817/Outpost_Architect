@@ -14,5 +14,5 @@ class OUTPOST_ARCHITECT_API UDecorator_CanAtk : public UBTDecorator
 public:
 	UDecorator_CanAtk();
 
-	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem) const override;
+	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 };

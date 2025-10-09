@@ -14,7 +14,7 @@ UTask_MoveToTarget::UTask_MoveToTarget()
 	bNotifyTick = true;
 }
 
-EBTNodeResult::Type UTask_MoveToTarget::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem)
+EBTNodeResult::Type UTask_MoveToTarget::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	AAIController* AICon = OwnerComp.GetAIOwner();
 	if (!AICon) return EBTNodeResult::Failed;
@@ -34,9 +34,9 @@ EBTNodeResult::Type UTask_MoveToTarget::ExecuteTask(UBehaviorTreeComponent& Owne
 	return EBTNodeResult::InProgress;
 }
 
-void UTask_MoveToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem, float DeltaSeconds)
+void UTask_MoveToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
-	Super::TickTask(OwnerComp, NodeMem, DeltaSeconds);
+	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
 	AAIController* AICon = OwnerComp.GetAIOwner();
 	if (!AICon) {

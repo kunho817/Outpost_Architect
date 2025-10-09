@@ -11,7 +11,7 @@ UDecorator_InRange::UDecorator_InRange()
 	NodeName = "In Range";
 }
 
-bool UDecorator_InRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem) const
+bool UDecorator_InRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	UBlackboardComponent* BB = OwnerComp.GetBlackboardComponent();
 	if (!BB) return false;

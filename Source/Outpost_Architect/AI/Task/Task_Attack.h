@@ -14,5 +14,5 @@ class OUTPOST_ARCHITECT_API UTask_Attack : public UBTTaskNode
 public:
 	UTask_Attack();
 
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem) override;
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 };

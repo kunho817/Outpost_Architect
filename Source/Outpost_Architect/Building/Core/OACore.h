@@ -14,4 +14,15 @@ class OUTPOST_ARCHITECT_API AOACore : public AOABuildingBase
 {
 	GENERATED_BODY()
 	
+public:
+	AOACore();
+
+protected:
+	virtual void BeginPlay() override;
+
+	virtual void Die_Implementation() override;
+
+private:
+	UPROPERTY();
+	class AOAGameMode* GM;
 };

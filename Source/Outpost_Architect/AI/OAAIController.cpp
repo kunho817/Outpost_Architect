@@ -6,11 +6,15 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Characters/OAEnemyBase.h"
 
-const FName AOAAIController::TargetActorKey = TEXT("TargetActor");
+const FName AOAAIController::CurrentActorKey = TEXT("CurrentTarget");
+const FName AOAAIController::CoreTargetKey = TEXT("CoreTarget");
+const FName AOAAIController::PlayerTargetKey = TEXT("PlayerTarget");
+const FName AOAAIController::ObstacleTargetKey = TEXT("ObstacleTarget");
 const FName AOAAIController::SelfActorKey = TEXT("SelfActor");
 const FName AOAAIController::AtkRangeKey = TEXT("AttackRange");
-const FName AOAAIController::DetectRangeKey = TEXT("DetectRange");
+const FName AOAAIController::DetectRangeKey = TEXT("DetectionRange");
 const FName AOAAIController::EnemyTypeKey = TEXT("EnemyType");
+
 
 AOAAIController::AOAAIController()
 {
@@ -21,19 +25,31 @@ void AOAAIController::OnPossess(APawn* IPawn)
 {
 	Super::OnPossess(IPawn);
 
-	if (!BT) return;
+	UE_LOG(LogTemp, Log, TEXT("=== AIController OnPossess: %s ==="), IPawn ? *IPawn->GetName() : TEXT("NULL"));
+
+	if (!BT) {
+		UE_LOG(LogTemp, Error, TEXT("❌ AIController: BehaviorTree is NULL!"));
+		return;
+	}
 
 	if (BT->BlackboardAsset) {
 		Blackboard->InitializeBlackboard(*BT->BlackboardAsset);
+		UE_LOG(LogTemp, Log, TEXT("   AIController: Blackboard is initialized"));
 
 		if (AOAEnemyBase* Enemy = Cast<AOAEnemyBase>(IPawn)) {
 			Blackboard->SetValueAsObject(SelfActorKey, Enemy);
-			Blackboard->SetValueAsFloat(AtkRangeKey, Enemy->AtkRange);
-			Blackboard->SetValueAsFloat(DetectRangeKey, Enemy->DetectRange);
-			Blackboard->SetValueAsEnum(EnemyTypeKey, static_cast<uint8>(Enemy->ET));
+			Blackboard->SetValueAsFloat(AtkRangeKey, Enemy->GetAtkRange());
+			Blackboard->SetValueAsFloat(DetectRangeKey, Enemy->GetDetectRange());
+			Blackboard->SetValueAsEnum(EnemyTypeKey, static_cast<uint8>(Enemy->GetEnemyType()));
+
+			UE_LOG(LogTemp, Log, TEXT("  AIController: Basic values set (AttackRange : %.1f | DetectionRange : %.1f)"), Enemy->GetAtkRange(), Enemy->GetDetectRange());
 		}
 
 		RunBehaviorTree(BT);
+		UE_LOG(LogTemp, Log, TEXT("✅ AIController: BehaviorTree started - Service will find targets"));
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("❌ AIController: BehaviorTree is NULL!"));
 	}
 }
 
@@ -43,15 +59,3 @@ void AOAAIController::OnUnPossess()
 
 	if (BT) BrainComponent->StopLogic(TEXT("Unpossessed"));
 }
-
-void AOAAIController::SetTargetActor(AActor* Target)
-{
-	if (Blackboard) Blackboard->SetValueAsObject(TargetActorKey, Target);
-}
-
-AActor* AOAAIController::GetTargetActor() const
-{
-	if (Blackboard) return Cast<AActor>(Blackboard->GetValueAsObject(TargetActorKey));
-	return nullptr;
-}
-

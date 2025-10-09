@@ -13,13 +13,6 @@ AOATurretBase::AOATurretBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	DetectRange = CreateDefaultSubobject<USphereComponent>(TEXT("DetectRange"));
-	DetectRange->SetupAttachment(RootComponent);
-	DetectRange->SetSphereRadius(500.0f);
-	DetectRange->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-	DetectRange->OnComponentBeginOverlap.AddDynamic(this, &AOATurretBase::OnDetectBeginOverlap);
-	DetectRange->OnComponentEndOverlap.AddDynamic(this, &AOATurretBase::OnDetectEndOverlap);
-
 	TurretHead = CreateDefaultSubobject<USceneComponent>(TEXT("TurretHead"));
 	TurretHead->SetupAttachment(RootComponent);
 
@@ -48,9 +41,15 @@ void AOATurretBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	DetectRange->SetSphereRadius(DectectRadius);
+	UE_LOG(LogTemp, Log, TEXT("=== Turret %s BeginPlay ==="), *GetName());
+	UE_LOG(LogTemp, Log, TEXT("  DetectRadius: %.1f, AtkRange: %.1f, IsOperation: %s, HasPower: %s"),
+		DectectRadius, AtkRange,
+		IsOperation() ? TEXT("TRUE") : TEXT("FALSE"),
+		HasGenPower() ? TEXT("TRUE") : TEXT("FALSE"));
 
 	GetWorldTimerManager().SetTimer(SearchTimerHandler, this, &AOATurretBase::SearchTarget, 0.5f, true);
+
+	UE_LOG(LogTemp, Log, TEXT("  Turret %s: Search timer started"), *GetName());
 }
 
 void AOATurretBase::Tick(float DeltaTime)
@@ -69,29 +68,45 @@ void AOATurretBase::SearchTarget()
 	if (!IsOperation() || !HasGenPower()) return;
 
 	if (CurrTarget && !IsValidTarget(CurrTarget)) {
+		UE_LOG(LogTemp, Log, TEXT("  Turret %s: Current target invalid, clearing"), *GetName());
 		CurrTarget = nullptr;
 		OnTargetLost();
 	}
-	if (!CurrTarget) SelectTarget();
+	if (!CurrTarget) {
+		TArray<FOverlapResult> OverlapRes;
+		FCollisionQueryParams QParam;
+		QParam.AddIgnoredActor(this);
+
+		FVector Loc = GetActorLocation();
+		FCollisionShape Sphere = FCollisionShape::MakeSphere(DectectRadius);
+
+		bool IsHit = GetWorld()->OverlapMultiByChannel(OverlapRes, Loc, FQuat::Identity, ECC_Pawn, Sphere, QParam);
+		if (IsHit) {
+			TArray<AActor*> DetectedEnemy;
+			for (const FOverlapResult& Res : OverlapRes) {
+				if (Res.GetActor() && Res.GetActor()->IsA(AOAEnemyBase::StaticClass())) DetectedEnemy.Add(Res.GetActor());
+			}
+
+			if (DetectedEnemy.Num() > 0) SelectTarget(DetectedEnemy);
+		}
+	}
 }
 
-void AOATurretBase::SelectTarget()
+void AOATurretBase::SelectTarget(const TArray<AActor*>& EnemyArr)
 {
-	if (DetectEnemy.Num() == 0) return;
-
-	TArray<AActor*> ValidTarget;
-	for (AActor* Enemy : DetectEnemy) {
-		if (IsValidTarget(Enemy)) ValidTarget.Add(Enemy);
+	TArray<AActor*> ValidT;
+	for (AActor* E : EnemyArr) {
+		if (IsValidTarget(E)) ValidT.Add(E);
 	}
 
-	if (ValidTarget.Num() == 0) return;
+	if (ValidT.Num() == 0) return;
 
 	AActor* BestTarget = nullptr;
 	switch (Prio)
 	{
 	case ETargetPriority::Closest: {
 		float Closest = FLT_MAX;
-		for (AActor* Target : ValidTarget) {
+		for (AActor* Target : ValidT) {
 			float Dist = FVector::Dist(GetActorLocation(), Target->GetActorLocation());
 			if (Dist < Closest) {
 				Closest = Dist;
@@ -103,7 +118,7 @@ void AOATurretBase::SelectTarget()
 
 	case ETargetPriority::Farthest: {
 		float Farthest = FLT_MIN;
-		for (AActor* Target : ValidTarget) {
+		for (AActor* Target : ValidT) {
 			float Dist = FVector::Dist(GetActorLocation(), Target->GetActorLocation());
 			if (Dist > Farthest) {
 				Farthest = Dist;
@@ -115,7 +130,7 @@ void AOATurretBase::SelectTarget()
 
 	case ETargetPriority::LowHP: {
 		float Low = FLT_MAX;
-		for (AActor* Target : ValidTarget) {
+		for (AActor* Target : ValidT) {
 			if (Target->GetClass()->ImplementsInterface(UOnDamage::StaticClass())) {
 				float HP = IOnDamage::Execute_GetCurrHealth(Target);
 				if (HP < Low) {
@@ -129,7 +144,7 @@ void AOATurretBase::SelectTarget()
 
 	case ETargetPriority::HighHP: {
 		float High = FLT_MIN;
-		for (AActor* Target : ValidTarget) {
+		for (AActor* Target : ValidT) {
 			if (Target->GetClass()->ImplementsInterface(UOnDamage::StaticClass())) {
 				float HP = IOnDamage::Execute_GetCurrHealth(Target);
 				if (HP > High) {
@@ -168,6 +183,9 @@ void AOATurretBase::DoAtk()
 
 	PrevAtkTime = GetWorld()->GetTimeSeconds();
 
+	UE_LOG(LogTemp, Log, TEXT("🔥 Turret %s: Attacking %s"),
+		*GetName(), CurrTarget ? *CurrTarget->GetName() : TEXT("NULL"));
+
 	switch (AtkType)
 	{
 	case ETurretAttackType::Projectile:
@@ -189,7 +207,13 @@ bool AOATurretBase::CanAtk()
 
 void AOATurretBase::ShootProjectile()
 {
-	if (!ProjClass || !CurrTarget) return;
+	if (!ProjClass || !CurrTarget) {
+		UE_LOG(LogTemp, Warning, TEXT("⚠️ Turret %s: Cannot shoot projectile (ProjClass: %s, Target: %s)"),
+			*GetName(),
+			ProjClass ? TEXT("OK") : TEXT("NULL"),
+			CurrTarget ? TEXT("OK") : TEXT("NULL"));
+		return;
+	}
 
 	FVector SpawnLoc = ShotPoint->GetComponentLocation();
 	FVector Dir = (CurrTarget->GetActorLocation() - SpawnLoc).GetSafeNormal();
@@ -200,7 +224,13 @@ void AOATurretBase::ShootProjectile()
 
 	AOAProjectile* Proj = GetWorld()->SpawnActor<AOAProjectile>(ProjClass, SpawnLoc, Dir.Rotation(), SpawnParam);
 
-	if (Proj) Proj->InitProjectile(AtkDmg, this, Dir);
+	if (Proj) {
+		Proj->InitProjectile(AtkDmg, this, Dir);
+		UE_LOG(LogTemp, Log, TEXT("  Turret %s: Projectile spawned"), *GetName());
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("❌ Turret %s: Failed to spawn projectile!"), *GetName());
+	}
 }
 
 void AOATurretBase::ShootHitscan()
@@ -256,21 +286,6 @@ bool AOATurretBase::IsAimToTarget()
 	float DotProduct = FVector::DotProduct(ForwardV, Dir);
 
 	return DotProduct > FMath::Cos(FMath::DegreesToRadians(5.0f));
-}
-
-void AOATurretBase::OnDetectBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult)
-{
-	if (OtherActor && OtherActor->IsA(AOAEnemyBase::StaticClass())) DetectEnemy.AddUnique(OtherActor);
-}
-
-void AOATurretBase::OnDetectEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	DetectEnemy.Remove(OtherActor);
-
-	if (CurrTarget == OtherActor) {
-		CurrTarget = nullptr;
-		OnTargetLost();
-	}
 }
 
 void AOATurretBase::OnTargetAcquire_Implementation(AActor* Target)

@@ -14,11 +14,11 @@ class OUTPOST_ARCHITECT_API UTask_BackMove : public UBTTaskNode
 public:
 	UTask_BackMove();
 
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem) override;
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 	UPROPERTY(EditAnywhere, Category = "Task")
 	float BackMoveSpeed = 200.f;
 
 protected:
-	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem, float DeltaSeconds) override;
+	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };

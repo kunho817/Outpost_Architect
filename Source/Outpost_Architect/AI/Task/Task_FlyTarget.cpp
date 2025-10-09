@@ -12,7 +12,7 @@ UTask_FlyTarget::UTask_FlyTarget()
 	bNotifyTick = true;
 }
 
-EBTNodeResult::Type UTask_FlyTarget::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem)
+EBTNodeResult::Type UTask_FlyTarget::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	AAIController* AICon = OwnerComp.GetAIOwner();
 	if (!AICon) return EBTNodeResult::Failed;
@@ -23,9 +23,9 @@ EBTNodeResult::Type UTask_FlyTarget::ExecuteTask(UBehaviorTreeComponent& OwnerCo
 	return EBTNodeResult::InProgress;
 }
 
-void UTask_FlyTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem, float DeltaSeconds)
+void UTask_FlyTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
-	Super::TickTask(OwnerComp, NodeMem, DeltaSeconds);
+	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
 	AAIController* AICon = OwnerComp.GetAIOwner();
 	if (!AICon) {
