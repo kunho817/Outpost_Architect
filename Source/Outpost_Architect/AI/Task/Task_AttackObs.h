@@ -22,5 +22,5 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Combat")
-	float AttackRange = 150.f;
+	float AttackRange = 250.f;
 };

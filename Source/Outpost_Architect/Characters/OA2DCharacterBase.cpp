@@ -72,10 +72,9 @@ bool AOA2DCharacterBase::Alive_Implementation() const
 
 void AOA2DCharacterBase::Die_Implementation()
 {
-	Death();
+	//Death();
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	GetCharacterMovement()->DisableMovement();
 
@@ -84,7 +83,8 @@ void AOA2DCharacterBase::Die_Implementation()
 
 void AOA2DCharacterBase::DeathFinish()
 {
-	SetLifeSpan(2.0f);
+	Destroy();
+	//SetLifeSpan(2.0f);
 }
 
 void AOA2DCharacterBase::Heal(float Heal)

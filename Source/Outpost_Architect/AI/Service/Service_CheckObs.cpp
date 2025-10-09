@@ -62,7 +62,7 @@ void UService_CheckObs::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 
 	if (IsHit && HitRes.GetActor()) {
 		AOABuildingBase* Building = Cast<AOABuildingBase>(HitRes.GetActor());
-		if (Building && Building->IsOperation()) {
+		if (Building && Building != BB->GetValueAsObject(AOAAIController::CoreTargetKey) && Building->IsOperation()) {
 			BB->SetValueAsObject(AOAAIController::ObstacleTargetKey, Building);
 			return;
 		}

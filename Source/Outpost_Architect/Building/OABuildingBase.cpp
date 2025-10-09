@@ -12,14 +12,14 @@ AOABuildingBase::AOABuildingBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ColComp = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComponent"));
-	ColComp->SetBoxExtent(FVector(50.0f, 50.0f, 50.0f));
+	ColComp->SetBoxExtent(FVector(150.0f, 150.0f, 150.0f));
 	ColComp->SetCollisionProfileName(TEXT("Building"));
 	RootComponent = ColComp;
 
 	SpriteComp = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("SpriteComponent"));
 	SpriteComp->SetupAttachment(RootComponent);
 
-	BuildingSize = FVector(100.0f, 100.0f, 100.0f);
+	BuildingSize = FVector(300.0f, 300.0f, 300.0f);
 	BType = EBuildingType::Core;
 	BState = EBuildingState::Construct;
 
@@ -70,7 +70,7 @@ void AOABuildingBase::Die_Implementation()
 	ColComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	FTimerHandle DTHandler;
-	GetWorldTimerManager().SetTimer(DTHandler, [this]() { Destroy(); }, 2.0f, false);
+	GetWorldTimerManager().SetTimer(DTHandler, [this]() { Destroy(); }, 0.2f, false);
 }
 
 bool AOABuildingBase::CanBuild_Implementation(const FVector& Loc) const
@@ -148,6 +148,11 @@ void AOABuildingBase::SetPowerState(bool Powered)
 	if (BState == EBuildingState::Enabled || BState == EBuildingState::Disabled) SetBState(Powered ? EBuildingState::Enabled : EBuildingState::Disabled);
 
 	OnPowerStateChange(Powered);
+}
+
+void AOABuildingBase::SetGhostState(bool NewState)
+{
+	IsGhost = NewState;
 }
 
 void AOABuildingBase::OnBuildingConstruct_Implementation()

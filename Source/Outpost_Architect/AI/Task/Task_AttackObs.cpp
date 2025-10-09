@@ -36,7 +36,10 @@ EBTNodeResult::Type UTask_AttackObs::ExecuteTask(UBehaviorTreeComponent& OwnerCo
 	}
 
 	float Dist = FVector::Dist(Enemy->GetActorLocation(), Obs->GetActorLocation());
-	if(Dist > AttackRange) return EBTNodeResult::Failed;
+	if (Dist > AttackRange) {
+		UE_LOG(LogTemp, Log, TEXT("Dist : %.1f"), Dist);
+		return EBTNodeResult::Failed;
+	}
 
 	return EBTNodeResult::InProgress;
 }
@@ -65,6 +68,7 @@ void UTask_AttackObs::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 
 	AActor* Obs = Cast<AActor>(BB->GetValueAsObject(AOAAIController::ObstacleTargetKey));
 	if (!Obs || !Obs->IsValidLowLevel()) {
+		UE_LOG(LogTemp, Log, TEXT("Obstacle Kill"));
 		BB->ClearValue(AOAAIController::ObstacleTargetKey);
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		return;
@@ -72,6 +76,7 @@ void UTask_AttackObs::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 
 	AOABuildingBase* Building = Cast<AOABuildingBase>(Obs);
 	if (!Building || !Building->IsOperation()) {
+		UE_LOG(LogTemp, Log, TEXT("Obstacle Kill"));
 		BB->ClearValue(AOAAIController::ObstacleTargetKey);
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		return;
@@ -83,15 +88,5 @@ void UTask_AttackObs::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 		return;
 	}
 
-	if (Enemy->CanAtk()) {
-		IOnDamage* DI = Cast<IOnDamage>(Building);
-		if (DI) {
-			FDamage DInfo;
-			DInfo.Damage = Enemy->AtkDmg;
-			DInfo.Instigator = Enemy;
-
-			IOnDamage::Execute_TakeDamage(Building, DInfo);
-			Enemy->PrevAtkTime = GetWorld()->GetTimeSeconds();
-		}
-	}
+	if (Enemy->CanAtk()) Enemy->DoAtk(Building);
 }

@@ -27,36 +27,28 @@ AOATurretBase::AOATurretBase()
 
 	DectectRadius = 500.0f;
 	AtkRange = 450.0f;
-	RotateSpeed = 180.0f;
+	RotateSpeed = 1.0f;
 
 	AtkDmg = 10.0f;
 	AtkCool = 1.0f;
 
 	CurrTarget = nullptr;
 	PrevAtkTime = -999.0f;
-
+	GenPower = true;
 }
 
 void AOATurretBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Log, TEXT("=== Turret %s BeginPlay ==="), *GetName());
-	UE_LOG(LogTemp, Log, TEXT("  DetectRadius: %.1f, AtkRange: %.1f, IsOperation: %s, HasPower: %s"),
-		DectectRadius, AtkRange,
-		IsOperation() ? TEXT("TRUE") : TEXT("FALSE"),
-		HasGenPower() ? TEXT("TRUE") : TEXT("FALSE"));
-
 	GetWorldTimerManager().SetTimer(SearchTimerHandler, this, &AOATurretBase::SearchTarget, 0.5f, true);
-
-	UE_LOG(LogTemp, Log, TEXT("  Turret %s: Search timer started"), *GetName());
 }
 
 void AOATurretBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!IsOperation() || !HasGenPower()) return;
+	if (!IsOperation() || !HasGenPower() || GetGhostState()) return;
 	if (CurrTarget) {
 		RotateToTarget(DeltaTime);
 		if (IsAimToTarget() && CanAtk()) DoAtk();
@@ -182,9 +174,6 @@ void AOATurretBase::DoAtk()
 	if (!CanAtk()) return;
 
 	PrevAtkTime = GetWorld()->GetTimeSeconds();
-
-	UE_LOG(LogTemp, Log, TEXT("🔥 Turret %s: Attacking %s"),
-		*GetName(), CurrTarget ? *CurrTarget->GetName() : TEXT("NULL"));
 
 	switch (AtkType)
 	{

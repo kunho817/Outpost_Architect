@@ -2,6 +2,7 @@
 
 
 #include "AI/Task/Task_MoveToTarget.h"
+#include "AI/OAAIController.h"
 #include "AIController.h"
 #include "Characters/OAEnemyBase.h"
 #include "BehaviorTree/BlackboardComponent.h"

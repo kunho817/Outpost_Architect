@@ -25,31 +25,19 @@ void AOAAIController::OnPossess(APawn* IPawn)
 {
 	Super::OnPossess(IPawn);
 
-	UE_LOG(LogTemp, Log, TEXT("=== AIController OnPossess: %s ==="), IPawn ? *IPawn->GetName() : TEXT("NULL"));
-
-	if (!BT) {
-		UE_LOG(LogTemp, Error, TEXT("❌ AIController: BehaviorTree is NULL!"));
-		return;
-	}
+	if (!BT) return;
 
 	if (BT->BlackboardAsset) {
 		Blackboard->InitializeBlackboard(*BT->BlackboardAsset);
-		UE_LOG(LogTemp, Log, TEXT("   AIController: Blackboard is initialized"));
 
 		if (AOAEnemyBase* Enemy = Cast<AOAEnemyBase>(IPawn)) {
 			Blackboard->SetValueAsObject(SelfActorKey, Enemy);
 			Blackboard->SetValueAsFloat(AtkRangeKey, Enemy->GetAtkRange());
 			Blackboard->SetValueAsFloat(DetectRangeKey, Enemy->GetDetectRange());
 			Blackboard->SetValueAsEnum(EnemyTypeKey, static_cast<uint8>(Enemy->GetEnemyType()));
-
-			UE_LOG(LogTemp, Log, TEXT("  AIController: Basic values set (AttackRange : %.1f | DetectionRange : %.1f)"), Enemy->GetAtkRange(), Enemy->GetDetectRange());
 		}
 
 		RunBehaviorTree(BT);
-		UE_LOG(LogTemp, Log, TEXT("✅ AIController: BehaviorTree started - Service will find targets"));
-	}
-	else {
-		UE_LOG(LogTemp, Error, TEXT("❌ AIController: BehaviorTree is NULL!"));
 	}
 }
 

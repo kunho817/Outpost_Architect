@@ -11,7 +11,7 @@ UOAGridSystem::UOAGridSystem()
 	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
-	GridSize = 100.0f;
+	GridSize = 300.0f;
 	SnapHeight = 0.0f;
 }
 

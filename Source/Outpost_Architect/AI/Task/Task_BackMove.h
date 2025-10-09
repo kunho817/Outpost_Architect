@@ -17,6 +17,8 @@ public:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 	UPROPERTY(EditAnywhere, Category = "Task")
+	FBlackboardKeySelector TargetKey;
+	UPROPERTY(EditAnywhere, Category = "Task")
 	float BackMoveSpeed = 200.f;
 
 protected:

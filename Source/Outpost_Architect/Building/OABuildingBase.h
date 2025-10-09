@@ -76,6 +76,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Building|Power")
 	bool GenPower;
 
+	bool IsGhost = false;
+
 public:
 	virtual void TakeDamage_Implementation(const FDamage& DInfo) override;
 	virtual float GetCurrHealth_Implementation() const override { return CurrHealth; }
@@ -96,7 +98,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Building")
 	EBuildingState GetBState() const { return BState; }
 	UFUNCTION(BlueprintPure, Category = "Building")
-	bool IsOperation() const { return BState == EBuildingState::Enabled; }
+	bool IsOperation() const { return BState != EBuildingState::Destroyed; }
 
 	UFUNCTION(BlueprintCallable, Category = "Building")
 	void StartConstruct();
@@ -109,6 +111,11 @@ public:
 	void SetPowerState(bool Powered);
 	UFUNCTION(BlueprintPure, Category = "Building")
 	bool HasGenPower() const { return GenPower; }
+
+	UFUNCTION(BlueprintCallable, Category = "Ghost")
+	void SetGhostState(bool NewState);
+	UFUNCTION(BlueprintPure, Category = "Ghost")
+	bool GetGhostState() const { return IsGhost; }
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Building")

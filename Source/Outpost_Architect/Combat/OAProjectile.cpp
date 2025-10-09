@@ -72,6 +72,8 @@ void AOAProjectile::ApplyDamage(AActor* Target)
 {
 	if (!Target) return;
 
+	UE_LOG(LogTemp, Log, TEXT("%s Damaged %.1f by Projectile"), *Target->GetName(), Dmg);
+
 	if (Target->GetClass()->ImplementsInterface(UOnDamage::StaticClass())) {
 		FDamage DInfo;
 		DInfo.Damage = Dmg;

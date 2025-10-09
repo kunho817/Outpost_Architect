@@ -28,7 +28,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	float DetectRange = 1500.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
-	float AtkRange = 150.f;
+	float AtkRange = 200.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float AtkDmg = 10.f;
@@ -38,6 +38,7 @@ public:
 	float PrevAtkTime = 0.f;
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	virtual void DoAtk(AActor* Target);
+	virtual void DoAtk();
 	UFUNCTION(BlueprintPure, Category = "Combat")
 	bool CanAtk() const;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Ranged")

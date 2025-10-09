@@ -128,12 +128,7 @@ void UOAWaveManager::ResetMapTimer()
 
 void UOAWaveManager::RegisterEnemy(APawn* Enemy)
 {
-	if (Enemy && !LivingEnemy.Contains(Enemy))
-	{
-		LivingEnemy.Add(Enemy);
-		UE_LOG(LogTemp, Log, TEXT("✅ WaveManager: Enemy registered - %s (Total: %d)"),
-			*Enemy->GetName(), LivingEnemy.Num());
-	}
+	if (Enemy && !LivingEnemy.Contains(Enemy)) LivingEnemy.Add(Enemy);
 }
 
 void UOAWaveManager::UnregisterEnemy(APawn* Enemy)
@@ -144,13 +139,9 @@ void UOAWaveManager::UnregisterEnemy(APawn* Enemy)
 
 void UOAWaveManager::RegisterCore(AActor* Core)
 {
-	if (!Core) {
-		UE_LOG(LogTemp, Error, TEXT("❌ WaveManager: Tried to register null core"));
-		return;
-	}
+	if (!Core) return;
 
 	BaseCore = Core;
-	UE_LOG(LogTemp, Warning, TEXT("✅ WaveManager: Core registered - %s"), *Core->GetName());
 }
 
 void UOAWaveManager::RefreshSpawn()
@@ -180,7 +171,7 @@ FWaveData UOAWaveManager::WaveDataGen_Implementation(int32 WaveNum)
 	FWaveData D;
 	D.WaveNum = WaveNum;
 
-	D.TotalEnemy = 20 + (WaveNum * 2);
+	D.TotalEnemy = 10 + (WaveNum * 2);
 	D.MEnemy = FMath::CeilToInt(D.TotalEnemy * 0.5f);
 	D.REnemy = FMath::CeilToInt(D.TotalEnemy * 0.5f);
 	D.SpawnIntev = FMath::Max(0.5f, 1.0f - (WaveNum * 0.1f));

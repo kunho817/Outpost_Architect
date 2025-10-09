@@ -48,22 +48,11 @@ void UService_EvaluateTarget::OnBecomeRelevant(UBehaviorTreeComponent& OwnerComp
 	if (!World) return;
 
 	AActor* Core = FindCoreTarget(World);
-	if (Core) {
-		BB->SetValueAsObject(AOAAIController::CoreTargetKey, Core);
-		UE_LOG(LogTemp, Warning, TEXT("✅ Service: CoreTarget initialized - %s"), *Core->GetName());
-	}
-	else {
-		UE_LOG(LogTemp, Error, TEXT("❌ Service: CoreTarget NOT FOUND"));
-	}
+	if (Core) BB->SetValueAsObject(AOAAIController::CoreTargetKey, Core);
 
 	AActor* Player = FindPlayerTarget(World);
-	if (Player) {
-		BB->SetValueAsObject(AOAAIController::PlayerTargetKey, Player);
-		UE_LOG(LogTemp, Warning, TEXT("✅ Service: PlayerTarget initialized - %s"), *Player->GetName());
-	}
-	else {
-		UE_LOG(LogTemp, Error, TEXT("⚠️ Service: PlayerTarget NOT FOUND"));
-	}
+	if (Player) BB->SetValueAsObject(AOAAIController::PlayerTargetKey, Player);
+
 
 	AOAAIController* AICon = Cast<AOAAIController>(OwnerComp.GetAIOwner());
 	if (AICon) {
@@ -71,8 +60,6 @@ void UService_EvaluateTarget::OnBecomeRelevant(UBehaviorTreeComponent& OwnerComp
 		if (Enemy) {
 			AActor* InitTarget = EvaluateCurrTarget(Enemy, Core, Player);
 			BB->SetValueAsObject(AOAAIController::CurrentActorKey, InitTarget);
-
-			if (InitTarget) UE_LOG(LogTemp, Warning, TEXT("✅ Service: CurrentTarget initialized - %s"), *InitTarget->GetName());
 		}
 	}
 }

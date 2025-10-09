@@ -41,7 +41,7 @@ EBTNodeResult::Type UTask_RangeAttack::ExecuteTask(UBehaviorTreeComponent& Owner
 
 	if (Proj) {
 		Proj->InitProjectile(Enemy->GetDmg(), Enemy, Dir);
-		Enemy->DoAtk(TargetA);
+		Enemy->DoAtk();
 		return EBTNodeResult::Succeeded;
 	}
 

@@ -15,7 +15,7 @@ AOAEnemyBase::AOAEnemyBase()
 	AIControllerClass = AOAAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	if (UCapsuleComponent* Col = GetCapsuleComponent()) Col->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	if (UCapsuleComponent* Col = GetCapsuleComponent()) Col->SetCollisionProfileName(TEXT("Enemy"));
 	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement()) MoveComp->bUseRVOAvoidance = false;
 }
 
@@ -23,18 +23,14 @@ void AOAEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Log, TEXT("=== %s BeginPlay Start ==="), *GetName());
-
 	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement()) {
 		if (MoveType == EEnemyMoveType::Fly) {
 			MoveComp->SetMovementMode(MOVE_Flying);
 			MoveComp->GravityScale = 0.f;
-			UE_LOG(LogTemp, Log, TEXT("  %s: Movement set to Flying"), *GetName());
 		}
 		else {
 			MoveComp->SetMovementMode(MOVE_Walking);
 			MoveComp->GravityScale = 1.f;
-			UE_LOG(LogTemp, Log, TEXT("  %s: Movement set to Walking"), *GetName());
 		}
 
 		MoveComp->MaxWalkSpeed = MoveSpeed;
@@ -44,13 +40,8 @@ void AOAEnemyBase::BeginPlay()
 	if (AOAGameMode* GM = Cast<AOAGameMode>(UGameplayStatics::GetGameMode(this))) {
 		WaveMan = GM->GetWaveMan();
 
-		if (WaveMan) {
-			WaveMan->RegisterEnemy(this);
-			UE_LOG(LogTemp, Log, TEXT("   %s: Registered to WaveManager"), *GetName());
-		}
+		if (WaveMan) WaveMan->RegisterEnemy(this);
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("=== %s BeginPlay End ==="), *GetName());
 }
 
 void AOAEnemyBase::Tick(float DeltaTime)
@@ -73,9 +64,14 @@ void AOAEnemyBase::DoAtk(AActor* Target)
 		DInfo.Instigator = this;
 
 		IOnDamage::Execute_TakeDamage(Target, DInfo);
-
-		UE_LOG(LogTemp, Log, TEXT(" % s: Attacked % s(Damage : % .1f)"), *GetName(), *Target->GetName(), AtkDmg);
 	}
+}
+
+void AOAEnemyBase::DoAtk()
+{
+	if (!CanAtk()) return;
+
+	PrevAtkTime = GetWorld()->GetTimeSeconds();
 }
 
 bool AOAEnemyBase::CanAtk() const

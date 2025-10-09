@@ -117,6 +117,7 @@ bool UBuildManager::TryPlaceBuilding()
 				Grid->OccupyGrid(OccupCoord, NBuilding);
 			}
 		}
+		NBuilding->SetGhostState(false);
 		NBuilding->StartConstruct();
 
 		return true;
@@ -194,6 +195,7 @@ void UBuildManager::CreateGhost()
 
 	if (Ghost) {
 		Ghost->SetActorEnableCollision(false);
+		Ghost->SetGhostState(true);
 	}
 }
 

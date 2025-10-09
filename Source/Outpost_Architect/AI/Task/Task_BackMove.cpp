@@ -25,7 +25,7 @@ EBTNodeResult::Type UTask_BackMove::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	UBlackboardComponent* BB = OwnerComp.GetBlackboardComponent();
 	if(!BB) return EBTNodeResult::Failed;
 
-	AActor* Target = Cast<AActor>(BB->GetValueAsObject(AOAAIController::CurrentActorKey));
+	AActor* Target = Cast<AActor>(BB->GetValueAsObject(TargetKey.SelectedKeyName));
 	if (!Target) return EBTNodeResult::Failed;
 
 	if (UCharacterMovementComponent* MoveComp = Enemy->GetCharacterMovement()) MoveComp->MaxWalkSpeed = BackMoveSpeed;
@@ -55,7 +55,7 @@ void UTask_BackMove::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 		return;
 	}
 
-	AActor* Target = Cast<AActor>(BB->GetValueAsObject(AOAAIController::CurrentActorKey));
+	AActor* Target = Cast<AActor>(BB->GetValueAsObject(TargetKey.SelectedKeyName));
 	if (!Target) {
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		return;
