@@ -7,6 +7,7 @@
 #include "AIController.h"
 #include "Characters/OAEnemyBase.h"
 #include "Combat/OAProjectile.h"
+#include "Components/SphereComponent.h"
 
 UTask_RangeAttack::UTask_RangeAttack()
 {
@@ -41,6 +42,7 @@ EBTNodeResult::Type UTask_RangeAttack::ExecuteTask(UBehaviorTreeComponent& Owner
 
 	if (Proj) {
 		Proj->InitProjectile(Enemy->GetDmg(), Enemy, Dir);
+		if (USphereComponent* ProjCol = Proj->FindComponentByClass<USphereComponent>()) ProjCol->SetCollisionProfileName(TEXT("EnemyProjectile"));
 		Enemy->DoAtk();
 		return EBTNodeResult::Succeeded;
 	}

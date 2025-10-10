@@ -48,7 +48,7 @@ void UService_CheckObs::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	FCollisionQueryParams QParam;
 	QParam.AddIgnoredActor(Enemy);
 
-	bool IsHit = GetWorld()->LineTraceSingleByChannel(HitRes, StartLoc, EndLoc, ECC_Visibility, QParam);
+	bool IsHit = GetWorld()->LineTraceSingleByChannel(HitRes, StartLoc, EndLoc, ECC_GameTraceChannel5, QParam);
 
 #if WITH_EDITOR
 	if (IsHit) {

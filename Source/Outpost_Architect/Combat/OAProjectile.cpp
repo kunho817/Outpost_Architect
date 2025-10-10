@@ -6,6 +6,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "PaperSpriteComponent.h"
 #include "Interfaces/OnDamage.h"
+#include "Characters/OA2DCharacterBase.h"
+#include "Building/OABuildingBase.h"
 #include "OAStruct.h"
 #include "TimerManager.h"
 
@@ -46,6 +48,9 @@ void AOAProjectile::InitProjectile(float NDmg, AActor* IInstigator, FVector Dir)
 	ProjInstigator = IInstigator;
 
 	ProjMove->Velocity = Dir.GetSafeNormal() * ProjSpeed;
+
+	if (AOABuildingBase* B = Cast<AOABuildingBase>(IInstigator)) OwnerTeam = B->GetTeam();
+	else if (AOA2DCharacterBase* C = Cast<AOA2DCharacterBase>(IInstigator)) OwnerTeam = C->GetTeam();
 }
 
 // Called when the game starts or when spawned
@@ -59,6 +64,7 @@ void AOAProjectile::BeginPlay()
 void AOAProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherA, UPrimitiveComponent* OtherComp, FVector NormalImpusle, const FHitResult& hit)
 {
 	if (OtherA == this || OtherA == ProjInstigator) return;
+	if (IsFriendly(OtherA)) return;
 
 	ApplyDamage(OtherA);
 
@@ -90,4 +96,17 @@ void AOAProjectile::EndLifeTime()
 {
 	OnProjDestroy();
 	Destroy();
+}
+
+bool AOAProjectile::IsFriendly(AActor* Target) const
+{
+	if (!Target) return false;
+	if (OwnerTeam == ETeam::Neutral) return false;
+
+	ETeam TargetTeam = ETeam::Neutral;
+
+	if (AOABuildingBase* B = Cast<AOABuildingBase>(Target)) TargetTeam = B->GetTeam();
+	else if (AOA2DCharacterBase* C = Cast<AOA2DCharacterBase>(Target)) TargetTeam = C->GetTeam();
+
+	return TargetTeam == OwnerTeam;
 }

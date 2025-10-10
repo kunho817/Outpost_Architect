@@ -6,6 +6,7 @@
 #include "PaperCharacter.h"
 #include "Interfaces/OnDamage.h"
 #include "OAStruct.h"
+#include "OAEnum.h"
 #include "OA2DCharacterBase.generated.h"
 
 /**
@@ -48,9 +49,17 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
 	void Death();
 
+	UFUNCTION(BlueprintPure, Category = "Team")
+	ETeam GetTeam() const { return Team; }
+	UFUNCTION(BlueprintCallable, Category = "Team")
+	void SetTeam(ETeam NTeam) { Team = NTeam; }
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void DeathFinish();
 
 	float LastDir = 1.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
+	ETeam Team = ETeam::Player;
 };

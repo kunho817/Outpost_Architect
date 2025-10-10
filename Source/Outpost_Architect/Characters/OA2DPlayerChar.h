@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Characters/OA2DCharacterBase.h"
+#include "Inventory/OAInventoryComponent.h"
+#include "OAEnum.h"
 #include "OA2DPlayerChar.generated.h"
 
 class UInputMappingContext;
@@ -21,6 +23,9 @@ protected:
 	virtual void BeginPlay() override;
 	void Move(const FInputActionValue& Val);
 	void Interact();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
+	UOAInventoryComponent* Inv = nullptr;
 
 public:
 	AOA2DPlayerChar();
@@ -41,4 +46,7 @@ public:
 	UInputAction* JumpAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* InteractAction;
+
+	UFUNCTION(BlueprintPure, Category = "Inventory")
+	UOAInventoryComponent* GetInv() const { return Inv; }
 };

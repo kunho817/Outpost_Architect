@@ -3,6 +3,7 @@
 
 #include "BuildSystem/BuildManager.h"
 #include "Building/OABuildingBase.h"
+#include "Inventory/OAInventoryComponent.h"
 #include "Core/OAGameMode.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
@@ -175,13 +176,57 @@ void UBuildManager::DestroyBuildingAtLocation()
 	}
 }
 
+void UBuildManager::SetPlayerInventory(UOAInventoryComponent* Inv)
+{
+	PlayerInv = Inv;
+}
+
+void UBuildManager::SetCentralInv(UOAInventoryComponent* Inv)
+{
+	CentralInv = Inv;
+}
+
 bool UBuildManager::HasEnoughResource(FBuildCost BCost)
 {
+	if (!PlayerInv) return false;
+
+	for (const FRecipeIngredient& Req : BCost.RequireItem) {
+		int32 PlayerAmount = PlayerInv->GetItemAmount(Req.ItemID);
+		int32 StorgeAmount = CentralInv ? CentralInv->GetItemAmount(Req.ItemID) : 0;
+
+		int32 TotalAvail = PlayerAmount + StorgeAmount;
+
+		if (TotalAvail < Req.Require) return false;
+	}
+
 	return true;
 }
 
 void UBuildManager::ConsumeResource(FBuildCost BCost)
 {
+	if (!PlayerInv) return;
+
+	for (const FRecipeIngredient& Req : BCost.RequireItem) {
+		int32 Remaining = Req.Require;
+
+		int32 PlayerAmount = PlayerInv->GetItemAmount(Req.ItemID);
+		int32 ToPAmount = FMath::Min(PlayerAmount, Remaining);
+
+		if (ToPAmount > 0) {
+			PlayerInv->RemoveItem(Req.ItemID, ToPAmount);
+			Remaining -= ToPAmount;
+		}
+
+		if (Remaining > 0 && CentralInv) {
+			int32 CentAmount = CentralInv->GetItemAmount(Req.ItemID);
+			int32 ToCAmount = FMath::Min(CentAmount, Remaining);
+
+			if (ToCAmount > 0) {
+				CentralInv->RemoveItem(Req.ItemID, ToCAmount);
+				Remaining -= ToCAmount;
+			}
+		}
+	}
 }
 
 void UBuildManager::CreateGhost()

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "OAStruct.h"
 #include "OAGameMode.generated.h"
 
 class UOAWaveManager;
@@ -34,6 +35,11 @@ public:
 	UFUNCTION(BlueprintPure, Category = "System")
 	UBuildManager* GetBuildMan() const { return BuildMan; }
 
+	UFUNCTION(BlueprintPure, Category = "Data")
+	FItemData GetItemData(FName ItemID) const;
+	UFUNCTION(BlueprintPure, Category = "Data")
+	UDataTable* GetDataTable() const { return ItemData; }
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -43,6 +49,8 @@ protected:
 	UOAGridSystem* Grid;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "System")
 	UBuildManager* BuildMan;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
+	UDataTable* ItemData = nullptr;
 
 private:
 	UFUNCTION()

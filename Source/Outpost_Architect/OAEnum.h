@@ -9,6 +9,14 @@
  */
 
 UENUM(BlueprintType)
+enum class ETeam : uint8
+{
+	Player UMETA(DisplayName = "Player"),
+	Enemy UMETA(DisplayName = "Enemy"),
+	Neutral UMETA(DisplayName = "Neutral"),
+};
+
+UENUM(BlueprintType)
 enum class EEnemyType : uint8
 {
 	Melee UMETA(DisplayName = "Melee"),
@@ -53,6 +61,14 @@ enum class EWaveTrigger : uint8
 {
 	MapTransition UMETA(DisplayName = "Map Transition"),
 	TimeOver UMETA(DisplayName = "TimeOver")
+};
+
+UENUM(BlueprintType)
+enum class EInventoryType : uint8
+{
+	Player UMETA(DisplayName = "Player Inventory"),
+	Storage UMETA(DisplayName = "Storage Inventory"),
+	Production UMETA(DisplayName = "Production Inventory")
 };
 
 class OUTPOST_ARCHITECT_API OAEnum

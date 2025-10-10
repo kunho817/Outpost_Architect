@@ -55,6 +55,8 @@ protected:
 	EBuildingState BState;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Info")
 	FVector BuildingSize;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Info")
+	ETeam Team = ETeam::Player;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building|Stat")
 	float MaxHealth;
@@ -99,6 +101,9 @@ public:
 	EBuildingState GetBState() const { return BState; }
 	UFUNCTION(BlueprintPure, Category = "Building")
 	bool IsOperation() const { return BState != EBuildingState::Destroyed; }
+	UFUNCTION(BlueprintPure, Category = "Building")
+	ETeam GetTeam() const { return Team; }
+
 
 	UFUNCTION(BlueprintCallable, Category = "Building")
 	void StartConstruct();

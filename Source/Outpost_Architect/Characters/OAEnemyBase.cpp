@@ -17,6 +17,8 @@ AOAEnemyBase::AOAEnemyBase()
 
 	if (UCapsuleComponent* Col = GetCapsuleComponent()) Col->SetCollisionProfileName(TEXT("Enemy"));
 	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement()) MoveComp->bUseRVOAvoidance = false;
+
+	SetTeam(ETeam::Enemy);
 }
 
 void AOAEnemyBase::BeginPlay()

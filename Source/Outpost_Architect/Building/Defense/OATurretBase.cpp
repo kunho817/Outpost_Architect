@@ -27,7 +27,7 @@ AOATurretBase::AOATurretBase()
 
 	DectectRadius = 500.0f;
 	AtkRange = 450.0f;
-	RotateSpeed = 1.0f;
+	RotateSpeed = 20.0f;
 
 	AtkDmg = 10.0f;
 	AtkCool = 1.0f;
@@ -60,7 +60,6 @@ void AOATurretBase::SearchTarget()
 	if (!IsOperation() || !HasGenPower()) return;
 
 	if (CurrTarget && !IsValidTarget(CurrTarget)) {
-		UE_LOG(LogTemp, Log, TEXT("  Turret %s: Current target invalid, clearing"), *GetName());
 		CurrTarget = nullptr;
 		OnTargetLost();
 	}
@@ -72,7 +71,7 @@ void AOATurretBase::SearchTarget()
 		FVector Loc = GetActorLocation();
 		FCollisionShape Sphere = FCollisionShape::MakeSphere(DectectRadius);
 
-		bool IsHit = GetWorld()->OverlapMultiByChannel(OverlapRes, Loc, FQuat::Identity, ECC_Pawn, Sphere, QParam);
+		bool IsHit = GetWorld()->OverlapMultiByChannel(OverlapRes, Loc, FQuat::Identity, ECC_GameTraceChannel6, Sphere, QParam);
 		if (IsHit) {
 			TArray<AActor*> DetectedEnemy;
 			for (const FOverlapResult& Res : OverlapRes) {
@@ -215,6 +214,7 @@ void AOATurretBase::ShootProjectile()
 
 	if (Proj) {
 		Proj->InitProjectile(AtkDmg, this, Dir);
+		if (USphereComponent* ProjCol = Proj->FindComponentByClass<USphereComponent>()) ProjCol->SetCollisionProfileName(TEXT("PlayerProjectile"));
 		UE_LOG(LogTemp, Log, TEXT("  Turret %s: Projectile spawned"), *GetName());
 	}
 	else {
@@ -253,7 +253,7 @@ void AOATurretBase::RotateToTarget(float DeltaTime)
 	FVector TargetLoc = CurrTarget->GetActorLocation();
 	FVector CurrLoc = TurretHead->GetComponentLocation();
 
-	FVector Dir = (TargetLoc - CurrLoc).GetSafeNormal2D();
+	FVector Dir = (TargetLoc - CurrLoc).GetSafeNormal();
 	FRotator TargetRot = Dir.Rotation();
 
 	FRotator CurrRot = TurretHead->GetComponentRotation();
@@ -268,7 +268,7 @@ bool AOATurretBase::IsAimToTarget()
 
 	FVector TargetLoc = CurrTarget->GetActorLocation();
 	FVector CurrLoc = TurretHead->GetComponentLocation();
-	FVector Dir = (TargetLoc - CurrLoc).GetSafeNormal2D();
+	FVector Dir = (TargetLoc - CurrLoc).GetSafeNormal();
 
 	FVector ForwardV = TurretHead->GetForwardVector();
 

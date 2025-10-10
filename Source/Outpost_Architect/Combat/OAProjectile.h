@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "OAEnum.h"
 #include "OAProjectile.generated.h"
 
 class USphereComponent;
@@ -20,6 +21,7 @@ public:
 	AOAProjectile();
 
 	void InitProjectile(float NDmg, AActor* IInstigator, FVector Dir);
+	void SetOwnerTeam(ETeam InTeam) { OwnerTeam = InTeam; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -43,6 +45,8 @@ protected:
 
 	UPROPERTY()
 	AActor* ProjInstigator;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
+	ETeam OwnerTeam;
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherA, UPrimitiveComponent* OtherComp, FVector NormalImpusle, const FHitResult& hit);
@@ -55,5 +59,7 @@ protected:
 
 	FTimerHandle LifeTimerHandler;
 	void EndLifeTime();
+
+	bool IsFriendly(AActor* Target) const;
 
 };

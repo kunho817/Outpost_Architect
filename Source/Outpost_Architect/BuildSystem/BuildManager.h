@@ -12,6 +12,7 @@
 class AOABuildingBase;
 class UInputAction;
 class UInputMappingContext;
+class UOAInventoryComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBuildModeChange, bool, IsActive);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPlacementChange, bool, IsCanPlace, FVector, Loc);
@@ -38,6 +39,11 @@ protected:
 	UOAGridSystem* Grid;
 	UPROPERTY()
 	APlayerController* OwnerCon;
+
+	UPROPERTY()
+	UOAInventoryComponent* PlayerInv = nullptr;
+	UPROPERTY()
+	UOAInventoryComponent* CentralInv = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Build")
 	bool BuildModeActive;
@@ -79,6 +85,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Build")
 	void DestroyBuildingAtLocation();
 
+	UFUNCTION(BlueprintCallable, Category = "Build")
+	void SetPlayerInventory(UOAInventoryComponent* Inv);
+	UFUNCTION(BlueprintCallable, Category = "Build")
+	void SetCentralInv(UOAInventoryComponent* Inv);
 	UFUNCTION(BlueprintCallable, Category = "Build")
 	bool HasEnoughResource(FBuildCost BCost);
 	UFUNCTION(BlueprintCallable, Category = "Build")

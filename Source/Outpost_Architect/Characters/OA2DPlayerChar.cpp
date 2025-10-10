@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Interfaces/Interactable.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
@@ -24,6 +25,12 @@ AOA2DPlayerChar::AOA2DPlayerChar()
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
+
+	SetTeam(ETeam::Player);
+
+	Inv = CreateDefaultSubobject<UOAInventoryComponent>(TEXT("Inventory"));
+	Inv->SetInvType(EInventoryType::Player);
+	Inv->SetMaxCap(100);
 }
 
 void AOA2DPlayerChar::BeginPlay()
@@ -64,5 +71,36 @@ void AOA2DPlayerChar::Move(const FInputActionValue& Val)
 
 void AOA2DPlayerChar::Interact()
 {
+	FVector StartLoc = GetActorLocation();
+	float InteractRadius = 300.0f;
 
+	TArray<FHitResult> HitRes;
+	FCollisionQueryParams QParam;
+	QParam.AddIgnoredActor(this);
+
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(InteractRadius);
+
+	bool IsHit = GetWorld()->SweepMultiByChannel(HitRes, StartLoc, StartLoc, FQuat::Identity, ECC_Visibility, Sphere, QParam);
+
+	if (!IsHit) return;
+
+	AActor* CloseInteractable = nullptr;
+	float CloseDist = FLT_MAX;
+
+	for (const FHitResult& Hit : HitRes) {
+		AActor* HActor = Hit.GetActor();
+		if (!HActor) continue;
+
+		if (HActor->GetClass()->ImplementsInterface(UInteractable::StaticClass())) {
+			if (IInteractable::Execute_CanInteract(HActor, this)) {
+				float Dist = FVector::Dist(StartLoc, HActor->GetActorLocation());
+				if (Dist < CloseDist) {
+					CloseDist = Dist;
+					CloseInteractable = HActor;
+				}
+			}
+		}
+	}
+
+	if (CloseInteractable) IInteractable::Execute_Interact(CloseInteractable, this);
 }

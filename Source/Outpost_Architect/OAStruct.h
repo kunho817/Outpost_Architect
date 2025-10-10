@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "OAStruct.generated.h"
 
 /**
@@ -10,7 +11,7 @@
  */
 
 USTRUCT(BlueprintType)
-struct FItemData{
+struct FItemData : public FTableRowBase {
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -35,8 +36,8 @@ struct FSlot{
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Stack = 0;
 
-	bool IsEmpty() { return Stack <= 0; }
-	bool IsFull() { return Stack >= Item.MaxStack; }
+	bool IsEmpty() const { return Stack <= 0; }
+	bool IsFull() const { return Stack >= Item.MaxStack; }
 };
 
 USTRUCT(BlueprintType)
@@ -56,16 +57,12 @@ struct FCraftRecipe{
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName RecipeID;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FRecipeIngredient> Input;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FRecipeIngredient output;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CraftTime = 1.0f;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool RequireFuel = false;
 };
@@ -76,7 +73,6 @@ struct FDamage{
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Damage = 0.f;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor* Instigator = nullptr;
 };
@@ -84,7 +80,6 @@ struct FDamage{
 USTRUCT(BlueprintType)
 struct FBuildCost{
 	GENERATED_USTRUCT_BODY()
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FRecipeIngredient> RequireItem;
 };

@@ -12,6 +12,16 @@ AOAGameMode::AOAGameMode()
 	BuildMan = CreateDefaultSubobject<UBuildManager>(TEXT("BuildManager"));
 }
 
+FItemData AOAGameMode::GetItemData(FName ItemID) const
+{
+	if (!ItemData) return FItemData();
+
+	FItemData* Data = ItemData->FindRow<FItemData>(ItemID, TEXT("GetItemData"));
+	if (Data) return *Data;
+
+	return FItemData();
+}
+
 void AOAGameMode::BeginPlay()
 {
 	Super::BeginPlay();
