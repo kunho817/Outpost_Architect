@@ -4,6 +4,8 @@
 #include "Resource/OAResourceNode.h"
 #include "Inventory/OAInventoryComponent.h"
 #include "PaperSpriteComponent.h"
+#include "Components/BoxComponent.h"
+#include "OAResourceNode.h"
 
 // Sets default values
 AOAResourceNode::AOAResourceNode()
@@ -11,8 +13,11 @@ AOAResourceNode::AOAResourceNode()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
+	ColComp = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComponent"));
+	RootComponent = ColComp;
+
 	MeshComp = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("Sprite"));
-	RootComponent = MeshComp;
+	MeshComp->SetupAttachment(RootComponent);
 
 }
 
@@ -27,6 +32,7 @@ void AOAResourceNode::BeginPlay()
 void AOAResourceNode::Interact_Implementation(AActor* Interactor)
 {
 	if (!Interactor) return;
+	UE_LOG(LogTemp, Log, TEXT("Interact Resource Node"));
 
 	float CurrTime = GetWorld()->GetTimeSeconds();
 	if (CurrTime - PrevMiningTime < MineCool) return;
@@ -37,10 +43,14 @@ void AOAResourceNode::Interact_Implementation(AActor* Interactor)
 
 	if (PInv->GetInvType() != EInventoryType::Player) return;
 
+	UE_LOG(LogTemp, Log, TEXT("Calculate Mine Amount"));
+
 	int32 PAvail = PInv->GetAvailSlot();
 	int32 MineAmount = FMath::Min(PAvail, MiningAmount);
 
 	if (MineAmount <= 0) return;
+
+	UE_LOG(LogTemp, Log, TEXT("Start Mine | Amount : %d"), MineAmount);
 
 	int32 MinedAmount = Mine(MineAmount);
 
@@ -48,6 +58,8 @@ void AOAResourceNode::Interact_Implementation(AActor* Interactor)
 		int32 AddAmount = PInv->AddItem(ItemID, MinedAmount);
 
 		PrevMiningTime = CurrTime;
+
+		OnMined(Interactor, AddAmount);
 
 		if (IsDepleted()) OnNodeDepleted();
 	}
@@ -86,6 +98,10 @@ float AOAResourceNode::GetDepletionPer() const
 void AOAResourceNode::OnNodeDepleted_Implementation()
 {
 	Destroy();
+}
+
+void AOAResourceNode::OnMined_Implementation(AActor* Miner, int32 Amount)
+{
 }
 
 int32 AOAResourceNode::Mine(int32 Request)

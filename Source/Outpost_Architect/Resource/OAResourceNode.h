@@ -8,6 +8,7 @@
 #include "OAResourceNode.generated.h"
 
 class UPaperSpriteComponent;
+class UBoxComponent;
 
 UCLASS()
 class OUTPOST_ARCHITECT_API AOAResourceNode : public AActor, public IInteractable
@@ -24,6 +25,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UPaperSpriteComponent* MeshComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
+	UBoxComponent* ColComp;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Resource")
 	FName ItemID = "Iron";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Resource")
@@ -35,6 +39,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Resource")
 	float MineCool = 1.0f;
 
+	float PrevMiningTime = 0.f;
+
 public:	
 	virtual void Interact_Implementation(AActor* Interactor) override;
 	virtual bool CanInteract_Implementation(AActor* Interactor) const override;
@@ -44,13 +50,19 @@ public:
 	bool IsDepleted() const { return RemainAmount <= 0; }
 	UFUNCTION(BlueprintPure, Category = "Resoruce")
 	float GetDepletionPer() const;
+	UFUNCTION(BlueprintPure, Category = "Resoruce")
+	int32 GetRemain() const { return RemainAmount; }
+	UFUNCTION(BlueprintPure, Category = "Resoruce")
+	FName GetItemID() const { return ItemID; }
+
 	UFUNCTION(BlueprintNativeEvent, Category = "Resource")
 	void OnNodeDepleted();
 	virtual void OnNodeDepleted_Implementation();
+	UFUNCTION(BlueprintNativeEvent, Category = "Resource")
+	void OnMined(AActor* Miner, int32 Amount);
+	virtual void OnMined_Implementation(AActor* Miner, int32 Amount);
 
 protected:
 	int32 Mine(int32 Request);
-
-	float PrevMiningTime = 0.f;
 
 };

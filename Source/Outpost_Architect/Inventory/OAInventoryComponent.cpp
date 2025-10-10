@@ -3,8 +3,8 @@
 
 #include "Inventory/OAInventoryComponent.h"
 #include "Core/OAGameMode.h"
+#include "Data/ItemDataAsset.h"
 #include "Kismet/GameplayStatics.h"
-#include "OAInventoryComponent.h"
 
 // Sets default values for this component's properties
 UOAInventoryComponent::UOAInventoryComponent()
@@ -26,10 +26,17 @@ void UOAInventoryComponent::BeginPlay()
 	if (InvType == EInventoryType::Player && Slots.Num() == 0) Slots.SetNum(1);
 }
 
-FItemData UOAInventoryComponent::GetItemData(FName ItemID) const
+UItemDataAsset* UOAInventoryComponent::GetItemAsset(FName ItemID) const
 {
 	AOAGameMode* GM = Cast<AOAGameMode>(UGameplayStatics::GetGameMode(this));
-	if (GM) return GM->GetItemData(ItemID);
+	if (GM) return GM->GetItemAsset(ItemID);
+	return nullptr;
+}
+
+FItemData UOAInventoryComponent::GetItemData(FName ItemID) const
+{
+	UItemDataAsset* Asset = GetItemAsset(ItemID);
+	if (Asset) return Asset->ToItemData();
 
 	return FItemData();
 }
@@ -48,17 +55,6 @@ const FSlot* UOAInventoryComponent::FindSlot(FName ItemID) const
 		if (!Slot.IsEmpty() && Slot.Item.ItemID == ItemID) return &Slot;
 	}
 	return nullptr;
-}
-
-int32 UOAInventoryComponent::FindEmptySlotIdx() const
-{
-	for (int32 i = 0; i < Slots.Num(); i++) {
-		FSlot Slot = Slots[i];
-
-		if (Slot.IsEmpty()) return i;
-	}
-
-	return 0;
 }
 
 void UOAInventoryComponent::BroadcastInventoryChange(FName ItemID, int32 NewAmount)
@@ -105,7 +101,6 @@ int32 UOAInventoryComponent::AddItem(FName ItemID, int32 Amount)
 	if (ItemID.IsNone() || Amount <= 0) return 0;
 	
 	FItemData ItemData = GetItemData(ItemID);
-	if (ItemData.ItemID.IsNone()) return 0;
 
 	int32 TotalAdded = 0;
 	int32 Remaining = Amount;

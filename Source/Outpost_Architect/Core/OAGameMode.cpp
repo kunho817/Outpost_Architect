@@ -2,6 +2,7 @@
 
 #include "Core/OAGameMode.h"
 #include "Core/OAWaveManager.h"
+#include "Inventory/OAInventoryComponent.h"
 #include "BuildSystem/OAGridSystem.h"
 #include "BuildSystem/BuildManager.h"
 
@@ -12,23 +13,32 @@ AOAGameMode::AOAGameMode()
 	BuildMan = CreateDefaultSubobject<UBuildManager>(TEXT("BuildManager"));
 }
 
+UItemDataAsset* AOAGameMode::GetItemAsset(FName ItemID) const
+{
+	if (!ItemDB) return nullptr;
+	return ItemDB->GetItemByID(ItemID);
+}
+
 FItemData AOAGameMode::GetItemData(FName ItemID) const
 {
-	if (!ItemData) return FItemData();
-
-	FItemData* Data = ItemData->FindRow<FItemData>(ItemID, TEXT("GetItemData"));
-	if (Data) return *Data;
-
-	return FItemData();
+	if (!ItemDB) return FItemData();
+	return ItemDB->GetItemData(ItemID);
 }
 
 void AOAGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (WaveMan)
-	{
-		WaveMan->OnWaveComplete.AddDynamic(this, &AOAGameMode::OnWaveComplete);
+	if (WaveMan) WaveMan->OnWaveComplete.AddDynamic(this, &AOAGameMode::OnWaveComplete);
+
+	if (ItemDB) ItemDB->InitDB();
+
+	if (UWorld* World = GetWorld()) {
+		APawn* Player = World->GetFirstPlayerController()->GetPawn();
+		if (Player) {
+			UOAInventoryComponent* PInv = Player->FindComponentByClass<UOAInventoryComponent>();
+			if (PInv && BuildMan) BuildMan->SetPlayerInventory(PInv);
+		}
 	}
 }
 

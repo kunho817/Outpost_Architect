@@ -89,6 +89,8 @@ public:
 	void SetPlayerInventory(UOAInventoryComponent* Inv);
 	UFUNCTION(BlueprintCallable, Category = "Build")
 	void SetCentralInv(UOAInventoryComponent* Inv);
+	UFUNCTION(BlueprintPure, Category = "Build")
+	bool IsInventorySetup() const { return PlayerInv != nullptr; }
 	UFUNCTION(BlueprintCallable, Category = "Build")
 	bool HasEnoughResource(FBuildCost BCost);
 	UFUNCTION(BlueprintCallable, Category = "Build")

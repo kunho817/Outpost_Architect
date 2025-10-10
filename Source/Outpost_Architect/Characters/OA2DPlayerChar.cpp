@@ -72,7 +72,7 @@ void AOA2DPlayerChar::Move(const FInputActionValue& Val)
 void AOA2DPlayerChar::Interact()
 {
 	FVector StartLoc = GetActorLocation();
-	float InteractRadius = 300.0f;
+	float InteractRadius = 500.0f;
 
 	TArray<FHitResult> HitRes;
 	FCollisionQueryParams QParam;
@@ -90,8 +90,8 @@ void AOA2DPlayerChar::Interact()
 	for (const FHitResult& Hit : HitRes) {
 		AActor* HActor = Hit.GetActor();
 		if (!HActor) continue;
-
 		if (HActor->GetClass()->ImplementsInterface(UInteractable::StaticClass())) {
+			UE_LOG(LogTemp, Log, TEXT("Hit Real Interactable Actor"));
 			if (IInteractable::Execute_CanInteract(HActor, this)) {
 				float Dist = FVector::Dist(StartLoc, HActor->GetActorLocation());
 				if (Dist < CloseDist) {

@@ -8,6 +8,8 @@
 #include "OAStruct.h"
 #include "OAInventoryComponent.generated.h"
 
+class UItemDataAsset;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryChange, FName, ItemID, int32, NewAmount);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -68,12 +70,11 @@ public:
 	FOnInventoryChange OnInventoryChange;
 
 protected:
+	UItemDataAsset* GetItemAsset(FName ItemID) const;
 	FItemData GetItemData(FName ItemID) const;
 
 	FSlot* FindSlot(FName ItemID);
 	const FSlot* FindSlot(FName ItemID) const;
-	
-	int32 FindEmptySlotIdx() const;
 
 	void BroadcastInventoryChange(FName ItemID, int32 NewAmount);
 };

@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/DataTable.h"
 #include "OAStruct.generated.h"
 
 /**
@@ -11,7 +10,7 @@
  */
 
 USTRUCT(BlueprintType)
-struct FItemData : public FTableRowBase {
+struct FItemData {
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
