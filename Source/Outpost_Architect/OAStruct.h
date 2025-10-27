@@ -13,15 +13,15 @@ USTRUCT(BlueprintType)
 struct FItemData {
 	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	FText ItemName;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	FName ItemID;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	UTexture2D* Icon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	int32 MaxStack = 50;
 };
 
@@ -59,7 +59,7 @@ struct FCraftRecipe{
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FRecipeIngredient> Input;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FRecipeIngredient output;
+	FRecipeIngredient Output;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CraftTime = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -73,7 +73,7 @@ struct FDamage{
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Damage = 0.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	AActor* Instigator = nullptr;
+	TWeakObjectPtr<AActor> Instigator = nullptr;
 };
 
 USTRUCT(BlueprintType)

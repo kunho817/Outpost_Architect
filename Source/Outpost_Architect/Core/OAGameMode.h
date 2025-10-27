@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "OAStruct.h"
 #include "Data/ItemDatabase.h"
+#include "Data/RecipeDatabase.h"
 #include "OAGameMode.generated.h"
 
 class UOAWaveManager;
@@ -43,6 +44,13 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Data")
 	UItemDatabase* GetItemDB() const { return ItemDB; }
 
+	UFUNCTION(BlueprintPure, Category = "Data")
+	URecipeDataAsset* GetRecipeAsset(FName RecipeID) const;
+	UFUNCTION(BlueprintPure, Category = "Data")
+	FCraftRecipe GetRecipeData(FName RecipeID) const;
+	UFUNCTION(BlueprintPure, Category = "Data")
+	URecipeDatabase* GetRecipeDB() const { return RecipeDB; }
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -54,6 +62,8 @@ protected:
 	UBuildManager* BuildMan;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
 	UItemDatabase* ItemDB = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
+	URecipeDatabase* RecipeDB = nullptr;
 
 private:
 	UFUNCTION()

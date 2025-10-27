@@ -25,6 +25,18 @@ FItemData AOAGameMode::GetItemData(FName ItemID) const
 	return ItemDB->GetItemData(ItemID);
 }
 
+URecipeDataAsset* AOAGameMode::GetRecipeAsset(FName RecipeID) const
+{
+	if (!RecipeDB) return nullptr;
+	return RecipeDB->GetRecipeByID(RecipeID);
+}
+
+FCraftRecipe AOAGameMode::GetRecipeData(FName RecipeID) const
+{
+	if (!RecipeDB) return FCraftRecipe();
+	return RecipeDB->GetRecipeData(RecipeID);
+}
+
 void AOAGameMode::BeginPlay()
 {
 	Super::BeginPlay();
@@ -32,6 +44,7 @@ void AOAGameMode::BeginPlay()
 	if (WaveMan) WaveMan->OnWaveComplete.AddDynamic(this, &AOAGameMode::OnWaveComplete);
 
 	if (ItemDB) ItemDB->InitDB();
+	if (RecipeDB) RecipeDB->InitDB();
 
 	if (UWorld* World = GetWorld()) {
 		APawn* Player = World->GetFirstPlayerController()->GetPawn();

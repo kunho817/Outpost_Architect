@@ -5,7 +5,6 @@
 #include "Inventory/OAInventoryComponent.h"
 #include "PaperSpriteComponent.h"
 #include "Components/BoxComponent.h"
-#include "OAResourceNode.h"
 
 // Sets default values
 AOAResourceNode::AOAResourceNode()
@@ -34,7 +33,10 @@ void AOAResourceNode::Interact_Implementation(AActor* Interactor)
 	if (!Interactor) return;
 	UE_LOG(LogTemp, Log, TEXT("Interact Resource Node"));
 
-	float CurrTime = GetWorld()->GetTimeSeconds();
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	float CurrTime = World->GetTimeSeconds();
 	if (CurrTime - PrevMiningTime < MineCool) return;
 
 	if (IsDepleted()) return;
@@ -69,7 +71,10 @@ bool AOAResourceNode::CanInteract_Implementation(AActor* Interactor) const
 {
 	if (IsDepleted()) return false;
 
-	float CurrTime = GetWorld()->GetTimeSeconds();
+	UWorld* World = GetWorld();
+	if (!World) return false;
+
+	float CurrTime = World->GetTimeSeconds();
 	if (CurrTime - PrevMiningTime < MineCool) return false;
 
 	return true;

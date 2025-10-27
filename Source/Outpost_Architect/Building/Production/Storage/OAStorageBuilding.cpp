@@ -3,7 +3,6 @@
 
 #include "Building/Production/Storage/OAStorageBuilding.h"
 #include "Inventory/OAInventoryComponent.h"
-#include "OAStorageBuilding.h"
 
 AOAStorageBuilding::AOAStorageBuilding()
 {
@@ -22,10 +21,11 @@ void AOAStorageBuilding::BeginPlay()
 void AOAStorageBuilding::Interact_Implementation(AActor* Interactor)
 {
 	if (!IsOperation()) return;
+	if (!IsValid(Interactor)) return;
 	UOAInventoryComponent* PInv = Interactor->FindComponentByClass<UOAInventoryComponent>();
 	if (!PInv || PInv->GetInvType() != EInventoryType::Player) return;
 
-	bool Succed = PInv->TTStorage(Inv);
+	PInv->TTStorage(Inv);
 }
 
 bool AOAStorageBuilding::CanInteract_Implementation(AActor* Interactor) const

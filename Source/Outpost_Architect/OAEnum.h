@@ -71,6 +71,17 @@ enum class EInventoryType : uint8
 	Production UMETA(DisplayName = "Production Inventory")
 };
 
+UENUM(BlueprintType)
+enum class EProductionState : uint8
+{
+	Idle UMETA(DisplayName = "Idle"),
+	Processing UMETA(DisplayName = "Process"),
+	Complete UMETA(DisplayName = "Complete"),
+	Paused UMETA(DisplayName = "Pause"),
+	NoInput UMETA(DisplayName = "No Input"),
+	NoSpace UMETA(DisplayName = "No Space")
+};
+
 class OUTPOST_ARCHITECT_API OAEnum
 {
 public:

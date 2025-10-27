@@ -205,7 +205,7 @@ int32 UOAInventoryComponent::GetItemAmount(FName ItemID) const
 	int32 TotalAmount = 0;
 
 	for (const FSlot& Slot : Slots) {
-		if (!Slot.IsEmpty()) TotalAmount += Slot.Stack;
+		if (!Slot.IsEmpty() && Slot.Item.ItemID == ItemID) TotalAmount += Slot.Stack;
 	}
 
 	return TotalAmount;
